@@ -26,6 +26,16 @@ pipeline {
                 sh 'mvn clean install'
             }
         }
+        stage('static-code-analysis'){
+            steps {
+                sh '''mvn clean verify sonar:sonar -Dsonar.projectKey=Java_App -Dsonar.projectName='Java_App' -Dsonar.host.url=http://54.221.62.194:9001 -Dsonar.token=sqp_4a5752a1156e25a56ec1da37988766a29bb5f660'''
+            }
+        }
+        stage('nexus artifact') {
+            steps {
+                sh ''' curl -v -u admin:admin123 --upload-file /var/lib/jenkins/workspace/Dynamic_App2/target/*.war http://54.221.62.194:8081/nexus/content/repositories/Dynamic-App2 '''
+            }
+        }
         stage('create the image'){
             steps {
                 sh 'docker build -t javaapp1 .'
