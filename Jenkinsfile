@@ -33,7 +33,7 @@ pipeline {
         }
         stage('nexus artifact') {
             steps {
-                sh ''' curl -v -u admin:admin123 --upload-file /var/lib/jenkins/workspace/Dynamic_App2/target/*.war http://54.221.62.194:8081/nexus/content/repositories/Dynamic-App2 '''
+                sh ''' curl -v -u admin:admin123 --upload-file /var/lib/jenkins/workspace/Dynamic_App2/target/*.war http://54.221.62.194:8081/nexus/content/repositories/Dynamic-App2/'''
             }
         }
         stage('create the image'){
