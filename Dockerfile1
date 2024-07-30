@@ -1,0 +1,64 @@
+pipeline {
+    agent any 
+    environment {
+        registry = "koteswarararaosairi/charvi"
+        withCredential = 'dockerhub'
+        dockerImage = ''
+    }
+    stages {
+        stage ('clone') {
+            steps {
+                git 'https://github.com/koti73/maven-web-app-youtuber.git'
+            }
+        }
+        stage ('compile ') {
+            steps {
+                sh ''' mvn compile'''
+            }
+        }
+        stage ('package') {
+            steps {
+                sh ''' mvn package '''
+            }
+        }
+        stage ('sonarcode') {
+            steps {
+               sh''' mvn clean verify sonar:sonar  -Dsonar.projectKey=kalpana  -Dsonar.host.url=http://54.89.43.222:9001  -Dsonar.login=sqp_2b0af1fee3ba01c2810db59894df2df67f2dcfc1'''
+            }
+        }
+        stage ('nexus') {
+            steps {
+            sh '''    curl -v -u admin:admin@1234 --upload-file /var/lib/jenkins/workspace/wholeproject/target/*.war http://54.89.43.222:8081/nexus/content/repositories/mykoti/'''
+            }
+        }
+        stage ('image'){
+            steps {
+                script {
+                dockerImage = docker.build registry
+                }
+            }
+        }
+        stage ('pushing') {
+            steps {
+                script {
+                    docker.withRegistry ('' , withCredential) {
+                        dockerImage.push ( )
+                    }
+                }
+            }
+        }
+        stage ('connecting ') {
+            steps {
+                sh '''
+                aws eks update-kubeconfig --region us-east-1 --name sample-ekscluster
+                kubectl get nodes 
+                '''
+            }
+        }
+        stage ('runn') {
+            steps {
+                sh ''' kubectl create -f maven-web-app-deploy.yml'''
+            }
+        }
+    }
+}
