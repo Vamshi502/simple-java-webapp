@@ -5,6 +5,17 @@ LABEL maintainer address "vamshi"
 COPY **/*.war /usr/local/tomcat/webapps
 CMD ["catalina.sh", "run"]
 EXPOSE 8080
+//------------------------------------------------------------------------------------------
+a. Use ubuntu as the base image.
+b. Install apache2 and configure it to work on 6400 port.
+
+FROM ubuntu
+RUN apt-get update && apt-get install -y apache2
+RUN sed -e 's/80/6400/g' /etc/apache2/ports.conf > tmp_ports.config
+RUN mv tmp_ports.config /etc/apache2/ports.conf
+EXPOSE 6400
+CMD ["apache2ctl", "-D", "FOREGROUND", "-k", "start"]
+
 
 //---------------------------------------------- apache2 index.html --------------------------------
 
