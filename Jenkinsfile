@@ -56,6 +56,18 @@ pipeline {
                 sh 'docker run --name con5 -d -p 9998:8080 vamshi5022/samplejavacode:v1 '
             }
         }
+         stage ('connection') {
+            steps {
+                sh ''' aws eks update-kubeconfig --region us-east-1 --name sample-ekscluster '''
+                sh ''' kubectl get nodes '''
+            }
+        }
+        stage ('deployment') {
+             steps {
+                 sh ''' kubectl create -f Deployment.yml '''
+             }
+             
+         }
         
     }
       
