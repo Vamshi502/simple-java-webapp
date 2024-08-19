@@ -1,0 +1,42 @@
+pipeline {
+    agent any 
+    stages {
+        stage ('git clone') {
+            steps {
+                git 'https://github.com/koteswararao73/maven-web-app-youtuber.git'
+            }
+        }
+        stage ('mvn package'){
+            steps {
+                sh ''' mvn package '''
+            }
+        }
+        stage ('build image') {
+            steps {
+                sh ''' docker build -t vamsi . '''
+            }
+        }
+        stage ('push into docker hub') {
+            steps {
+                script {
+                    sh ''' docker tag vamsi koteswarararaosairi/vamsinath:v1234 '''
+                  withDockerRegistry(credentialsId: 'aeddcdssd') {
+                      sh ''' docker  push koteswarararaosairi/vamsinath:v1234 '''
+                    }
+                }
+            }
+        }
+        stage ('connection') {
+            steps {
+                sh ''' aws eks update-kubeconfig --region ap-south-1 --name sample-ekscluster '''
+                sh ''' kubectl get nodes '''
+            }
+        }
+         stage ('deployment') {
+             steps {
+                 sh ''' kubectl create -f Deployment.yml '''
+             }
+             
+         }
+    }
+}
